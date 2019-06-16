@@ -60,14 +60,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private ImageButton googleBtn, twitterBtn, facebookBtn;
 
     private GoogleSignInClient mGoogleSignInClient;
-    private FirebaseAuth.AuthStateListener listener = new FirebaseAuth.AuthStateListener() {
-        @Override
-        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-            if (firebaseAuth.getCurrentUser() != null) {
-                gotoMainActivity();
-            }
-        }
-    };
 
     private static final String EMAIL = "email";
     private CallbackManager callbackManager;
@@ -125,7 +117,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart() {
         super.onStart();
-        firebaseAuth.addAuthStateListener(listener);
     }
 
     private void initView() {

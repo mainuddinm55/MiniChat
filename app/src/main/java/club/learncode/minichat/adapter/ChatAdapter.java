@@ -1,121 +1,162 @@
 package club.learncode.minichat.adapter;
 
-
-import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.paging.PagedListAdapter;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import club.learncode.minichat.R;
-import club.learncode.minichat.model.Conversion;
+import club.learncode.minichat.model.Chat;
+import club.learncode.minichat.model.Message;
 import club.learncode.minichat.model.User;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatAdapter extends PagedListAdapter<Conversion, ChatAdapter.MessageHolder> {
-    private static final int MESSAGE_TYPE_LEFT = 1;
-    private static final int MESSAGE_TYPE_RIGHT = 2;
-    private FirebaseUser currentUser;
-    private User chatUser;
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatHolder> {
+    private List<Chat> chatList = new ArrayList<Chat>();
+    private DatabaseReference userRef;
+    private DatabaseReference messageRef;
+    private ItemClickListener itemClickListener;
 
-    private static DiffUtil.ItemCallback<Conversion> DIFF_UTIL = new DiffUtil.ItemCallback<Conversion>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull Conversion oldItem, @NonNull Conversion newItem) {
-            return oldItem.getId().equals(newItem.getId());
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull Conversion oldItem, @NonNull Conversion newItem) {
-            return oldItem.getMessage().equals(newItem.getMessage());
-        }
-    };
-
-
-    public ChatAdapter(FirebaseUser currentUser, User chatUser) {
-        super(DIFF_UTIL);
-        this.currentUser = currentUser;
-        this.chatUser = chatUser;
+    public ChatAdapter() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        userRef = rootRef.child("User");
+        messageRef = rootRef.child("Messages").child(currentUser.getUid());
     }
-
 
     @NonNull
     @Override
-    public MessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = null;
-        if (viewType == MESSAGE_TYPE_LEFT) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_left, parent, false);
-        } else if (viewType == MESSAGE_TYPE_RIGHT) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_right, parent, false);
-        }
-        assert view != null;
-        return new MessageHolder(view);
+
+    public ChatHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ChatHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.people_row_item, parent, false));
+
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageHolder holder, int position) {
-        Conversion conversion = getItem(position);
-        holder.bindTo(conversion);
-    }
+    public void onBindViewHolder(@NonNull final ChatHolder holder, int position) {
+        final Chat chat = chatList.get(position);
+        messageRef.child(chat.getUserid()).limitToLast(1)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        Message message = dataSnapshot.getValue(Message.class);
+                        holder.setMessage(message);
+                    }
 
-    @Override
-    public int getItemViewType(int position) {
-        if (currentUser != null) {
-            if (getItem(position).getSenderId().equals(currentUser.getUid())) {
-                return MESSAGE_TYPE_RIGHT;
-            } else {
-                return MESSAGE_TYPE_LEFT;
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        userRef.child(chat.getUserid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final User user = dataSnapshot.getValue(User.class);
+                holder.setUser(user);
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (itemClickListener != null)
+                            itemClickListener.onItemClicked(user);
+                    }
+                });
             }
-        }
-        return -1;
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    class MessageHolder extends RecyclerView.ViewHolder {
+    @Override
+    public int getItemCount() {
+        return chatList.size();
+    }
 
-        CircleImageView profileImageView;
-        TextView messageTextView, msgSeenTextView;
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+        notifyDataSetChanged();
+    }
 
-        MessageHolder(@NonNull View itemView) {
+    public void setChatList(List<Chat> chatList) {
+        this.chatList = chatList;
+        notifyDataSetChanged();
+    }
+
+    class ChatHolder extends RecyclerView.ViewHolder {
+        private final CircleImageView profileImageView;
+        private final TextView nameTextView, emailTextView;
+        private final ImageView onlineImageView;
+
+        ChatHolder(@NonNull View itemView) {
             super(itemView);
             profileImageView = itemView.findViewById(R.id.profile_image_view);
-            messageTextView = itemView.findViewById(R.id.show_message);
-            msgSeenTextView = itemView.findViewById(R.id.msg_seen_text_view);
-
+            nameTextView = itemView.findViewById(R.id.name_text_view);
+            emailTextView = itemView.findViewById(R.id.email_text_view);
+            onlineImageView = itemView.findViewById(R.id.online_image_view);
         }
 
-        void bindTo(Conversion conversion) {
-            messageTextView.setText(conversion.getMessage());
-            String url;
-            if (getItemViewType() == MESSAGE_TYPE_RIGHT) {
-                url = currentUser.getPhotoUrl().toString();
+        void setMessage(Message message) {
+            emailTextView.setText(message.getMessage());
+            if (!message.isSeen()) {
+                emailTextView.setTypeface(emailTextView.getTypeface(), Typeface.BOLD);
             } else {
-                url = chatUser.getPhotoUrl();
-            }
-            Glide.with(itemView.getContext()).load(url).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)).placeholder(R.drawable.placeholder).error(R.drawable.profile_image).into(profileImageView);
-
-            if (getAdapterPosition() == (getCurrentList().size() - 1)) {
-                if (getItem(getAdapterPosition()).isSeen()) {
-                    msgSeenTextView.setText("seen");
-                } else {
-                    msgSeenTextView.setText("delivered");
-                }
-            } else {
-                msgSeenTextView.setVisibility(View.GONE);
+                emailTextView.setTypeface(emailTextView.getTypeface(), Typeface.NORMAL);
             }
         }
+
+        public void setUser(User user) {
+            Glide.with(itemView).load(user.getPhotoUrl()).apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+                    .placeholder(R.drawable.placeholder).error(R.drawable.profile_image).into(profileImageView);
+            nameTextView.setText(user.getDisplayName());
+            if (user.getOnlineStatus().equals("online")) {
+                onlineImageView.setVisibility(View.VISIBLE);
+            } else {
+                onlineImageView.setVisibility(View.GONE);
+            }
+        }
+
     }
 
-    public interface ItemClickedListener {
-        void onDownloadItemClicked(String url);
+    public interface ItemClickListener {
+        void onItemClicked(User user);
     }
 }

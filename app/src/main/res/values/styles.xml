@@ -44,5 +44,10 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="HintTextApearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/user_input_color</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
 
 </resources>

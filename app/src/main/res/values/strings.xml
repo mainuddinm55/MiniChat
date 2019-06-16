@@ -25,5 +25,6 @@
     <string name="user">Users</string>
     <string name="start_conversion">Start Conversion</string>
     <string name="message_hint_text">Type a message....</string>
+    <string name="logout">Logout</string>
 
 </resources>

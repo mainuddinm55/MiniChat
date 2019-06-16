@@ -1,9 +1,11 @@
 package club.learncode.minichat.adapter;
 
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import club.learncode.minichat.R;
+import club.learncode.minichat.model.Message;
 import club.learncode.minichat.model.User;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -54,13 +57,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
     class UserHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final CircleImageView profileImageView;
         private final TextView nameTextView, emailTextView;
-
+        private final ImageView onlineImageView;
         UserHolder(@NonNull View itemView) {
             super(itemView);
             profileImageView = itemView.findViewById(R.id.profile_image_view);
             nameTextView = itemView.findViewById(R.id.name_text_view);
             emailTextView = itemView.findViewById(R.id.email_text_view);
-
+            onlineImageView = itemView.findViewById(R.id.online_image_view);
             itemView.setOnClickListener(this);
         }
 
@@ -69,13 +72,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserHolder> {
                     .placeholder(R.drawable.placeholder).error(R.drawable.profile_image).into(profileImageView);
             nameTextView.setText(user.getDisplayName());
             emailTextView.setText(user.getEmail());
+            if (user.getOnlineStatus().equals("online")) {
+                onlineImageView.setVisibility(View.VISIBLE);
+            } else {
+                onlineImageView.setVisibility(View.GONE);
+            }
         }
+
 
         @Override
         public void onClick(View v) {
             if (itemClickListener != null)
                 itemClickListener.onItemClicked(userList.get(getAdapterPosition()));
         }
+
     }
 
     public interface ItemClickListener {

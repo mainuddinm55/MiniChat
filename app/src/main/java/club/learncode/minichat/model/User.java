@@ -7,6 +7,8 @@ public class User implements Serializable {
     private String email;
     private String displayName;
     private String photoUrl;
+    private String typingTo;
+    private String onlineStatus;
 
     public User() {
     }
@@ -48,5 +50,21 @@ public class User implements Serializable {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public String getTypingTo() {
+        return typingTo;
+    }
+
+    public void setTypingTo(String typingTo) {
+        this.typingTo = typingTo;
+    }
+
+    public void setOnlineStatus(String onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
+
+    public String getOnlineStatus() {
+        return onlineStatus;
     }
 }

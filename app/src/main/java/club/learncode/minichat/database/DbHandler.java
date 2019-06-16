@@ -1,8 +1,7 @@
 package club.learncode.minichat.database;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -13,25 +12,27 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import club.learncode.minichat.listener.DataFetchListener;
-import club.learncode.minichat.model.Conversion;
-import club.learncode.minichat.model.Friendship;
 import club.learncode.minichat.model.User;
 
 public class DbHandler {
+    private final DatabaseReference rootRef;
     private DatabaseReference userRef;
-    private DatabaseReference conversionRef;
+    private DatabaseReference messageRef;
     private FirebaseUser currentUser;
 
     public DbHandler() {
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        rootRef = FirebaseDatabase.getInstance().getReference();
         userRef = rootRef.child("User");
-        conversionRef = rootRef.child("Conversion");
+        messageRef = rootRef.child("Messages");
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
@@ -58,7 +59,9 @@ public class DbHandler {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (final DataSnapshot data : dataSnapshot.getChildren()) {
                     final User user = data.getValue(User.class);
-                    userList.add(user);
+                    if (!user.getUid().equals(currentUser.getUid())) {
+                        userList.add(user);
+                    }
                 }
                 listener.onComplete(userList);
             }
@@ -70,22 +73,36 @@ public class DbHandler {
         });
     }
 
-    public void getConversions(User chatUser, final DataFetchListener<List<Conversion>> listener) {
-        final List<Conversion> conversionList = new ArrayList<>();
-        listener.showProgress();
-        conversionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    Conversion conversion = data.getValue(Conversion.class);
-                    conversionList.add(conversion);
-                }
-                listener.onComplete(conversionList);
-            }
 
+    public void sendMessage(User chatUser, String message) {
+        String currentUserRef = "Messages/" + currentUser.getUid() + "/" + chatUser.getUid();
+        String chatUserRef = "Messages/" + chatUser.getUid() + "/" + currentUser.getUid();
+        DatabaseReference userMessagePushRef = rootRef.child("Messages").child(currentUser.getUid())
+                .child(chatUser.getUid()).push();
+        String pushId = userMessagePushRef.getKey();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("message", message);
+        hashMap.put("seen", false);
+        hashMap.put("sendTime", System.currentTimeMillis());
+        hashMap.put("from", currentUser.getUid());
+
+        HashMap<String, Object> messageMap = new HashMap<>();
+        messageMap.put(currentUserRef + "/" + pushId, hashMap);
+        messageMap.put(chatUserRef + "/" + pushId, hashMap);
+
+        rootRef.child("Chat").child(currentUser.getUid()).child(chatUser.getUid()).child("seen").setValue(true);
+        rootRef.child("Chat").child(currentUser.getUid()).child(chatUser.getUid()).child("timestamp").setValue(ServerValue.TIMESTAMP);
+        rootRef.child("Chat").child(currentUser.getUid()).child(chatUser.getUid()).child("userid").setValue(chatUser.getUid());
+
+        rootRef.child("Chat").child(chatUser.getUid()).child(currentUser.getUid()).child("seen").setValue(false);
+        rootRef.child("Chat").child(chatUser.getUid()).child(currentUser.getUid()).child("timestamp").setValue(ServerValue.TIMESTAMP);
+        rootRef.child("Chat").child(chatUser.getUid()).child(currentUser.getUid()).child("userid").setValue(currentUser.getUid());
+
+
+        rootRef.updateChildren(messageMap, new DatabaseReference.CompletionListener() {
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                listener.onFailure(databaseError.toException());
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+
             }
         });
     }

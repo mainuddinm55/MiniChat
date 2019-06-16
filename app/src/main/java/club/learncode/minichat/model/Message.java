@@ -1,17 +1,19 @@
 package club.learncode.minichat.model;
 
-public class Conversion {
+public class Message {
     private String id;
-    private String senderId;
-    private String receiverId;
+    private String from;
     private String message;
-    private String sendTime;
+    private long sendTime;
     private boolean seen;
 
-    public Conversion(String id, String senderId, String receiverId, String message, String sendTime, boolean seen) {
+    public Message() {
+
+    }
+
+    public Message(String id, String from, String message, long sendTime, boolean seen) {
         this.id = id;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
+        this.from= from;
         this.message = message;
         this.sendTime = sendTime;
         this.seen = seen;
@@ -25,20 +27,12 @@ public class Conversion {
         this.id = id;
     }
 
-    public String getSenderId() {
-        return senderId;
+    public String getFrom() {
+        return from;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-    public String getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     public String getMessage() {
@@ -49,11 +43,11 @@ public class Conversion {
         this.message = message;
     }
 
-    public String getSendTime() {
+    public long getSendTime() {
         return sendTime;
     }
 
-    public void setSendTime(String sendTime) {
+    public void setSendTime(long sendTime) {
         this.sendTime = sendTime;
     }
 

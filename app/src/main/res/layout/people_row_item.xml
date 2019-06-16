@@ -55,6 +55,14 @@
                 tools:text="@string/email_hint" />
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/online_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_online"
+            android:visibility="gone" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
