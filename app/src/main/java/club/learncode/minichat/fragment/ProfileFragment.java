@@ -126,7 +126,7 @@ public class ProfileFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
                                 DatabaseReference userRef = rootRef.child("User").child(user.getUid());
-                                userRef.child("photoUrl").setValue(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString());
+                                userRef.child("displayName").setValue(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
                                 updateUI();
                             }
                         }

@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_keyboard_arrow);
         setSupportActionBar(toolbar);
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
@@ -48,17 +50,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, (DrawerLayout) null);
     }
-    
+
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        Log.e("MainActivity", "onStart: " );
+        Log.e("MainActivity", "onStart: ");
 
         if (currentUser != null) {
-
+            mUserRef = FirebaseDatabase.getInstance().getReference().child("User").child(currentUser.getUid());
             mUserRef.child("onlineStatus").setValue("online");
-
         }
     }
 

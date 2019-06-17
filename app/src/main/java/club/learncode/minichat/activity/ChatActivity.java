@@ -204,7 +204,7 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
                 .placeholder(R.drawable.placeholder).error(R.drawable.profile_image).into(profileImageView);
         nameTextView.setText(chatUser.getDisplayName());
         getMessages(chatUser);
-
+        seenMessages();
     }
 
 
@@ -324,6 +324,39 @@ public class ChatActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void checkTypingStatus(String type) {
         userRef.child(currentUser.getUid()).child("typingTo").setValue(type);
+    }
+
+    private void seenMessages() {
+        Query query = messageRef.child(chatUser.getUid())
+                .child(currentUser.getUid())
+                .limitToLast(1);
+
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                messageRef.child(chatUser.getUid()).child(currentUser.getUid()).child(dataSnapshot.getKey()).child("seen").setValue(true);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override

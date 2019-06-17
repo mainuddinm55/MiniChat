@@ -8,16 +8,16 @@
     <fragment
         android:id="@+id/nav_chat"
         android:name="club.learncode.minichat.fragment.ChatFragment"
-        android:label="fragment_chat"
+        android:label="Chats"
         tools:layout="@layout/fragment_chat" />
     <fragment
         android:id="@+id/nav_profile"
         android:name="club.learncode.minichat.fragment.ProfileFragment"
-        android:label="fragment_profile"
+        android:label="Profile"
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/nav_user"
         android:name="club.learncode.minichat.fragment.UserFragment"
-        android:label="fragment_other"
+        android:label="Users"
         tools:layout="@layout/fragment_user" />
 </navigation>

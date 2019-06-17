@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,6 +44,8 @@ public class ChatFragment extends Fragment implements ChatAdapter.ItemClickListe
     private List<Chat> chatList = new ArrayList<>();
     private ChatAdapter chatAdapter;
     private Context context;
+    private ProgressBar progressBar;
+    private TextView noChatTextView;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -67,6 +71,8 @@ public class ChatFragment extends Fragment implements ChatAdapter.ItemClickListe
         chatRef = rootRef.child("Chat").child(currentUser.getUid());
 
         RecyclerView chatRecyclerView = view.findViewById(R.id.chat_recycler_view);
+        progressBar = view.findViewById(R.id.progress_bar);
+        noChatTextView = view.findViewById(R.id.no_user_text_view);
         chatRecyclerView.setHasFixedSize(true);
         chatAdapter = new ChatAdapter();
         chatRecyclerView.setAdapter(chatAdapter);
@@ -79,6 +85,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.ItemClickListe
     public void onStart() {
         super.onStart();
         chatList.clear();
+        progressBar.setVisibility(View.VISIBLE);
         Query query = chatRef.orderByChild("timestamp");
 
         query.addChildEventListener(new ChildEventListener() {
@@ -88,29 +95,39 @@ public class ChatFragment extends Fragment implements ChatAdapter.ItemClickListe
                 Chat chat = dataSnapshot.getValue(Chat.class);
                 chatList.add(chat);
                 chatAdapter.notifyDataSetChanged();
+                toggleNoData();
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                progressBar.setVisibility(View.GONE);
             }
         });
 
+    }
+
+    private void toggleNoData() {
+        progressBar.setVisibility(View.GONE);
+        if (chatList.size() > 0) {
+            noChatTextView.setVisibility(View.GONE);
+        } else {
+            noChatTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

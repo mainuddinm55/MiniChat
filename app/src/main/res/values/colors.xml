@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="white">#FFFFFF</color>
-    <color name="blue">#0000FF</color>
-    <color name="green">#008000</color>
-    <color name="red">#FF0000</color>
-    <color name="gradient">#663154</color>
-    <color name="unfocused_color">#696969</color>
-    <color name="user_input_color">#2B2A2A</color>
+  <color name="colorPrimary">#2196F3</color>
+  <color name="colorPrimaryDark">#1976D2</color>
+  <color name="colorAccent">#FF4081</color>
+  <color name="white">#FFFFFF</color>
+  <color name="blue">#0000FF</color>
+  <color name="green">#008000</color>
+  <color name="red">#FF0000</color>
+  <color name="gradient">#663154</color>
+  <color name="unfocused_color">#696969</color>
+  <color name="user_input_color">#2B2A2A</color>
 </resources>
