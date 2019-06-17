@@ -68,7 +68,6 @@ public class UserFragment extends Fragment implements UserAdapter.ItemClickListe
         userListRecyclerView.setHasFixedSize(true);
         userListRecyclerView.setAdapter(userAdapter);
 
-        getUsers();
     }
 
     private void getUsers() {
@@ -94,6 +93,12 @@ public class UserFragment extends Fragment implements UserAdapter.ItemClickListe
                 progressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getUsers();
     }
 
     @Override
