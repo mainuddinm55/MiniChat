@@ -14,12 +14,13 @@
 /captures
 .externalNativeBuild
 .cxx
+!/app/release/wow_chat_app.apk
 /app/build
 /release
 /local.properties
 *.log
 # Built application files
-*.apk
+!wow_char_app.apk
 *.aar
 *.ap_
 *.aab
