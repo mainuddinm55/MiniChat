@@ -1,6 +1,7 @@
 # MiniChat
+MiniChat is a simple chat application between users. you can check it out from [here](wow_chat_app.apk)
 
-# Reginstration Method:
+# Registration Method:
 1) Email & Password
 2) Facebook
 3) Google play account
