@@ -250,7 +250,6 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                                 if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                                     Toasty.error(RegistrationActivity.this, "An account already exists with the same email address", Toast.LENGTH_LONG).show();
                                 } else {
-                                    task.getException().printStackTrace();
                                     Toasty.error(RegistrationActivity.this, "Some error occurred, try again", Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -259,8 +258,9 @@ public class RegistrationActivity extends AppCompatActivity implements View.OnCl
                     });
                 } else {
                     dismissDialog();
-                    authResultTask.getException().printStackTrace();
-                    Toasty.error(RegistrationActivity.this, "Email or Password Invalid", Toast.LENGTH_LONG).show();
+                    Log.d("", "onComplete: "+authResultTask.getException());
+                    String message = authResultTask.getException() != null ? authResultTask.getException().getLocalizedMessage() : "Email or Password Invalid";
+                    Toasty.error(RegistrationActivity.this, message == null ? "Email or Password Invalid" : message, Toast.LENGTH_LONG).show();
                 }
             }
         });

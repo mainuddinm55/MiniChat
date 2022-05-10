@@ -42,11 +42,15 @@ public class DbHandler {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 listener.onComplete(task);
+                if (!task.isSuccessful()) {
+                    FirebaseAuth.getInstance().signOut();
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 listener.onFailure(e);
+                FirebaseAuth.getInstance().signOut();
             }
         });
     }

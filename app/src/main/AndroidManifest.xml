@@ -18,7 +18,8 @@
         <activity android:name=".activity.ChatActivity"/>
         <activity
             android:name=".activity.SplashScreenActivity"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

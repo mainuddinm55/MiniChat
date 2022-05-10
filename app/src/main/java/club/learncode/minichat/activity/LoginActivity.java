@@ -203,8 +203,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Toasty.success(LoginActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
                     gotoMainActivity();
                 } else {
-                    task.getException().printStackTrace();
-                    Toasty.error(LoginActivity.this, "Email or Password Invalid", Toast.LENGTH_LONG).show();
+                    String message = "Email or Password Invalid";
+                    if (task.getException() != null) {
+                        message = task.getException().getLocalizedMessage();
+                    }
+                    Toasty.error(LoginActivity.this, message, Toast.LENGTH_LONG).show();
                 }
             }
         });
